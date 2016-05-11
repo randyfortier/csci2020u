@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Multi-threading - CSCI 2020u</title>
+
+        <link href="images/uoit_logo_icon_32.ico" rel="icon" type="image/x-icon"/>
+        <link href="images/uoit_logo_icon_32.ico" rel="shortcut icon" type="image/x-icon"/>
+
+		<meta name="description" content="A lecture on reading from and writing to file" />
+		<meta name="author" content="Randy J. Fortier" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" id="theme" />
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/printable.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section data-background="images/UOIT_background6.png"
+                         data-background-size="70%"
+				         data-transition='fade'>
+					<h2 style="margin-left: 30%; font-size: 80%">Multi-threading</h2>
+					<h3 style="margin-left: 30%">Parallel Execution</h3>
+					<p style="margin-left: 30%">
+						<small>
+                            Randy J. Fortier<br />
+                            <a href="mailto:randy.fortier@uoit.ca">randy.fortier@uoit.ca</a><br />
+                            <a href="http://twitter.com/randy_fortier">@randy_fortier</a>
+                        </small>
+					</p>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Outline</h2>
+					<ul>
+                        <li>Threads vs. processes</li>
+                        <li>Pros and cons</li>
+                        <li>Implementation
+                            <ul>
+                                <li>Runnable</li>
+                                <li>Thread</li>
+                                <li>Interrupts</li>
+                                <li>Joins</li>
+                            </ul>
+                        </li>
+                        <li>Concurrency models
+                            <ul>
+                                <li>Parallel worker</li>
+                                <li>Reactive</li>
+                                <li>Fork/join</li>
+                            </ul>
+                        </li>
+                        <li>Synchronization</li>
+					</ul>
+				</section>
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background6.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">Multi-threading</h2>
+                        <h3 style="margin-left: 30%">What are threads?</h3>
+                    </section>
+                    <section>
+                        <h2>Threads vs. Processes</h2>
+                        <ul>
+                            <li>Process
+                                <ul>
+                                    <li>Can run in parallel</li>
+                                    <li>Created at the OS level</li>
+                                    <li>Has own memory space (segmentation)</li>
+                                </ul>
+                            </li>
+                            <li>Thread
+                                <ul>
+                                    <li>Can run in parallel (within a process)</li>
+                                    <li>Created at the language or OS level</li>
+                                    <li>Share a single memory space</li>
+                                    <li>Lightweight context switching</li>
+                                    <li>Simpler communication</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Threads</h2>
+                        <ul>
+                            <li>Pros
+                                <ul>
+                                    <li>Take advantage of multi-core processors</li>
+                                    <li>Responsive UI</li>
+                                </ul>
+                            </li>
+                            <li>Cons
+                                <ul>
+                                    <li>Complexity</li>
+                                    <li>Unpredictability</li>
+                                    <li>Shared data synchronization</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+                </section>
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background6.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">Multi-threading</h2>
+                        <h3 style="margin-left: 30%">Implementing Threads</h3>
+                    </section>
+                    <section>
+                        <h2>Runnable</h2>
+                        <ul>
+                            <li>An interface that you can implement</li>
+                            <li>You can pass this to a thread to execute</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+public class ClientConnectionHandler implements Runnable {
+    public void run() {
+        // do something concurrently
+    }
+}
+...
+ClientConnectionHandler handler = new ClientConnectionHandler();
+Thread handlerThread = new Thread(handler, "Handler Thread");
+handlerThread.start();
+                        </code></pre>
+                        <aside class="notes">
+                        Note:  Be sure to call start(), not run()!
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Thread</h2>
+                        <ul>
+                            <li>You can also sub-class Thread directly</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+public class ClientThread extends Thread {
+    public ClientThread(String name) {
+        super(name);
+    }
+    
+    public void run() {
+        // do something concurrently
+    }
+}
+...
+ClientThread handlerThread = new ClientThread("Handler Thread");
+handlerThread.start();
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Interrupts</h2>
+                        <ul>
+                            <li>For long calculations, we may want to interrupt a thread
+                                <ul>
+                                    <li>e.g. if we figure out that this entire calculation is non-optimal</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+public class ClientConnectionHandler implements Runnable {
+    public void run() {
+        boolean moreToDo = true;
+        while (moreToDo) {
+            ... do some work ...
+            if (Thread.interrupted())
+                return;
+            ... update moreToDo ...
+        }
+    }
+}
+...
+Thread handlerThread = new Thread(new ClientConnectionHandler());
+handlerThread.start();
+...
+handlerThread.interrupt();
+
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Joins</h2>
+                        <ul>
+                            <li>When sub-threads are no longer doing anything, you can join them:
+                                <ul>
+                                    <li>t.join():  Wait indefinitely for thread 't' to die</li>
+                                    <li>t.join(millis):  Wait up to 'millis' milliseconds for thread 't' to die</li>
+                                    <li>t.join(millis, nanos):  Wait up to 'millis' milliseconds and 'nanos' nanoseconds for thread 't' to die</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+ClientThread handlerThread = new ClientThread("Handler Thread");
+handlerThread.start();
+... do stuff ...
+handlerThread.join(200);
+                        </code></pre>
+                    </section>
+                    
+                    <section>
+                        <h2>Yield</h2>
+                        <ul>
+                            <li>To hint that the thread scheduler that another thread should be given CPU time instead</li>
+                            <li>Unlike join(), this thread may still have more work to do</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+ClientThread handlerThread = new ClientThread("Handler Thread");
+handlerThread.start();
+... do stuff ...
+Thread.yield();
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Thread Methods</h2>
+                        <ul>
+                            <li>currentThread():  Get the current thread</li>
+                            <li>sleep(1500):  Put the current thread into sleep state</li>
+                            <li>getName():  Get a thread's name</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+ClientThread handlerThread = new ClientThread("Handler Thread");
+handlerThread.start();
+...
+Thread.sleep(1000);
+System.out.println("Thread name: " + Thread.currentThread().getName());
+...
+                        </code></pre>
+                    </section>
+                </section>
+            
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background6.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">Multi-threading</h2>
+                        <h3 style="margin-left: 30%">Concurrency Models</h3>
+                    </section>
+                    
+                    <section>
+                        <h2>Concurrency Models</h2>
+                        <ul>
+                            <li>Parallel Worker</li>
+                            <li>Reactive</li>
+                            <li>Fork/Join</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Concurrency Models</h2>
+                        <ul>
+                            <li>Parallel Worker</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+WorkerThread[] workerThreads = new WorkerThread[NUM_WORKERS];
+SharedState sharedState = ...
+for (int i = 0; i < NUM_WORKERS; i++) {
+   workerThreads[i] = new WorkerThread(sharedState);
+   workerThreads[i].start();
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Concurrency Models</h2>
+                        <ul>
+                            <li>Reactive
+                                <ul>
+                                    <li>When events occur, create threads as needed</li>
+                                    <li>e.g. new chat client -> create thread to handle it</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs js" data-trim contenteditable>
+app.get('/clients', function(req, res){
+  res.send('clients:');
+  for (var i = 0; i < clients.length; i++) {
+    res.send(clients[i]);
+  }
+});
+
+app.get('/products', function(req, res){
+  res.send('products:');
+  for (var i = 0; i < products.length; i++) {
+    res.send(products[i]);
+  }
+});
+</code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Concurrency Models</h2>
+                        <ul>
+                            <li>Fork/Join</li>
+                            <li><a href="http://tutorials.jenkov.com/java-util-concurrent/java-fork-and-join-forkjoinpool.html" class="noPadding">Tutorial using ForkJoin library in Java</a></li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+if (problem.size < SMALL_PROBLEM) {
+    ... solve the problem directly ...
+} else {
+    ... split problem into problem1 and problem2 ...
+    ProblemThread t1 = new ProblemThread(problem1);
+    ProblemThread t2 = new ProblemThread(problem2);
+    t1.start();
+    t2.start();
+}
+                        </code></pre>
+                    </section>
+                </section>
+                
+        
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background6.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">Multi-threading</h2>
+                        <h3 style="margin-left: 30%">Data Synchronization</h3>
+                    </section>
+
+                    <section>
+                        <h2>Data Synchronization</h2>
+                        <ul>
+                            <li>Many concurrency models involve shared data</li>
+                            <li>Simultaneous shared access to data can cause problems</li>
+                            <li>e.g.
+                                <ul>
+                                    <li>Thread 1: Reads account balance ($200)</li>
+                                    <li>Thread 2: Reads account balance ($200)</li>
+                                    <li>Thread 1: Reduces balance ($200-$150=$50)</li>
+                                    <li>Thread 2: Reduces balance ($50-$100=-$50)</li>
+                                </ul>
+                            </li>
+                            <li>This is an example of a <em>race condition</em></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Critical Section</h2>
+                        <ul>
+                            <li>The previous example had two threads with <em>critical sections</em>
+                                <ul>
+                                    <li>A critical section is a block of code that requires <em>mutual exclusion</em> for one or more data values</li>
+                                    <li>Some programming languages support a <em>mutex</em> (the mutex acts as a resource lock when the resource is in use)</li>
+                                    <li>For more detailed access control a <em>semaphore</em> can be used (an object/registry that manages access to the resource)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Mutex</h2>
+                        <ul>
+                            <li>A mutex can be as simple as a boolean variable:</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+class SharedState {
+    private boolean inUse = false;
+    private List&gt;Customer&gt; customers = null;
+    public void addCustomer(Customer cust) throws ResourceInUseException {
+        if (inUse) {
+            throw new ResourceInUseException("Customers list in use");
+        } else {
+            inUse = true;
+            ... manipulate customers ...
+            inUse = false;
+        }
+    }
+}
+                        </code></pre>
+                    </section>
+                    
+                    <section>
+                        <h2>Data Synchronization</h2>
+                        <ul>
+                            <li>An application is called <em>thread safe</em> if it takes measures to avoid race conditions:
+                                <ul>
+                                    <li>Immutable/copied data (similar to pass by value)
+                                        <ul>
+                                            <li>Shared state is copied</li>
+                                            <li>Copy cannot be modified</li>
+                                        </ul>
+                                    </li>
+                                    <li>Resource locks
+                                        <ul>
+                                            <li>Only one thread can hold the lock at once</li>
+                                            <li>The thread that has the lock can write</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Shared Resources</h2>
+                        <ul>
+                            <li>Shared resources:
+                                <ul>
+                                    <li>Objects to which multiple threads have access</li>
+                                    <li>e.g. Public/static variable</li>
+                                    <li>e.g. Database, files</li>
+                                </ul>
+                            </li>
+                            <li>Non-shared resources:
+                                <ul>
+                                    <li>Local variables in the run() method</li>
+                                    <li>Private instance variables in the Thread/Runnable</li>
+                                    <li>Except:  Variables that store object references/pointers to objects defined elsewhere (on the heap)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <section>
+                        <h2>Volatile</h2>
+                        <ul>
+                            <li>Due to each core of a CPU having its own cache, it is possible that changes to a shared object cannot be observed by other threads</li>
+                            <li>The solution:  volatile</li>
+                            <li>Volatile guarantees the strict ordering of reads/writes</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+class SharedState {
+    public volatile Map&lt;String,Customer&gt; customers = ...
+}
+                        </code></pre>
+                    </section>
+                
+                    <section>
+                        <h2>Synchronized</h2>
+                        <ul>
+                            <li>A synchronized block prevents multiple threads executing code at once</li>
+                            <li>Varieties:
+                                <ul>
+                                    <li>Methods</li>
+                                    <li>Static methods</li>
+                                    <li>Code blocks</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                
+                    <section>
+                        <h2>Synchronized</h2>
+                        <ul>
+                            <li>A synchronized block prevents multiple threads executing code at once</li>
+                            <li>Varieties:
+                                <ul>
+                                    <li>Methods:</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+class SharedState {
+    public synchronized void placeOrder(Order order) {
+        ...
+    }
+}
+                        </code></pre>
+                    </section>
+                
+                    <section>
+                        <h2>Synchronized</h2>
+                        <ul>
+                            <li>A synchronized block prevents multiple threads executing code at once</li>
+                            <li>Varieties:
+                                <ul>
+                                    <li>Methods</li>
+                                    <li>Static methods:</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim 
+                                   contenteditable>
+class SharedState {
+    static Map&lt;String,Customer&gt; customers;
+    public static synchronized Map&lt;String,Customer&gt; getCustomers() {
+        return customers;
+    }
+}
+                        </code></pre>
+                    </section>
+                
+                    <section>
+                        <h2>Synchronized</h2>
+                        <ul>
+                            <li>A synchronized block prevents multiple threads executing code at once</li>
+                            <li>Varieties:
+                                <ul>
+                                    <li>Methods</li>
+                                    <li>Static methods</li>
+                                    <li>Code blocks:</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+class SharedState {
+    private float balance = 0f;
+    private List&lt;Transaction&gt; transactions = null;
+    public boolean preauthorize(float amount) {
+        if (amount > balance) {
+            synchronized {
+                transactions.add(new Transaction("Suspicious preauth"));
+            }
+            return false;
+        }
+        return true;
+    }
+}
+                        </code></pre>
+                    </section>
+                </section>
+        
+                <section data-transition='fade'>
+					<h2>Wrap-Up</h2>
+					<ul>
+						<li>In this section we learned about:
+							<ul>
+                                <li>Threads</li>
+                                <li>Concurrency models</li>
+                                <li>Shared resources</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+		<script src="js/uoit.js"></script>
+
+	</body>
+</html>

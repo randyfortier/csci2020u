@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Files and Streams - CSCI 2020u</title>
+
+        <link href="images/uoit_logo_icon_32.ico" rel="icon" type="image/x-icon"/>
+        <link href="images/uoit_logo_icon_32.ico" rel="shortcut icon" type="image/x-icon"/>
+
+		<meta name="description" content="A lecture on reading from and writing to file" />
+		<meta name="author" content="Randy J. Fortier" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" id="theme" />
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/printable.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section data-background="images/UOIT_background4.png"
+                         data-background-size="70%"
+				         data-transition='fade'>
+					<h1 style="margin-left: 30%">Files and Streams</h1>
+					<h3 style="margin-left: 30%">Loading and Saving Data</h3>
+					<p style="margin-left: 30%">
+						<small>
+                            Randy J. Fortier<br />
+                            <a href="mailto:randy.fortier@uoit.ca">randy.fortier@uoit.ca</a><br />
+                            <a href="http://twitter.com/randy_fortier">@randy_fortier</a>
+                        </small>
+					</p>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Outline</h2>
+					<ul>
+                        <li>Streams
+                            <ul>
+                                <li>InputStream</li>
+                                <li>OutputStream</li>
+                            </ul>
+                        </li>
+                        <li>Files
+                            <ul>
+                                <li>File</li>
+                                <li>FileInputStream</li>
+                                <li>FileReader</li>
+                                <li>FileOutputStream</li>
+                                <li>FileWriter</li>
+                            </ul>
+                        </li>
+                        <li>Scanner</li>
+					</ul>
+				</section>
+
+				<section data-background="images/UOIT_background4.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Files and Streams</h1>
+                    <h3 style="margin-left: 30%">Streams</h3>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Blocks</h2>
+					<ul>
+                        <li>Alternative: just load data on demand
+                            <ul>
+                                <li>Too many disk accesses</li>
+                                <li>Delays</li>
+                            </ul>
+                        </li>
+                        <li>Blocks
+                            <ul>
+                                <li>Buffering</li>
+                                <li>Block size</li>
+                            </ul>
+                        </li>
+                        <li>Problem with blocks:
+                            <ul>
+                                <li>What if we don't want an entire block?</li>
+                            </ul>
+                        </li>
+					</ul>
+                    <aside class="notes">
+                        
+                    </aside>
+				</section>
+                
+				<section data-transition='fade'>
+					<h2>Streams</h2>
+					<ul>
+                        <li>Streams are an operating system construct
+                            <ul>
+                                <li>Input stream
+                                    <ul>
+                                        <li>To the programmer:  endless incoming data source</li>
+                                        <li>Reality:  as the disk data is loaded, it is placed into the input buffer</li>
+                                    </ul>
+                                </li>
+                                <li>Output stream
+                                    <ul>
+                                        <li>To the programmer:  endless outgoing data sink</li>
+                                        <li>Reality:  the output is placed into an output buffer</li>
+                                        
+                                    </ul>
+                                </li>
+                                <li>The result is much simpler file (and network) code</li>
+                            </ul>
+                        </li>
+					</ul>
+                    <aside class="notes">
+                    </aside>
+				</section>
+                
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide1.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide2.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide3.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide4.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide5.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide6.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide7.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide8.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Input Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide9.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Output Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide10.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Output Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide11.png" /></div>
+                </section>
+                <section data-transition="fade">
+                    <h2>Output Streams</h2>
+                    <div><img src="images/04_files_and_streams/slide12.png" /></div>
+                </section>
+        
+                <section data-transition="fade">
+                    <h2>Input Streams in Java</h2>
+                    <ul>
+                        <li>InputStream and FileInputStream:</li>
+                    </ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+final int BLOCK_SIZE = 1024;
+InputStream input = new FileInputStream("myfile.txt");
+byte[] buffer = new byte[BLOCK_SIZE];
+int numBytesRead = 0;
+while ((numBytesRead = input.read(buffer)) != -1) {
+    // do something with buffer[0..numBytesRead-1]
+}
+                    </code></pre>
+                </section>
+                
+                <section data-transition="fade">
+                    <h2>Output Streams in Java</h2>
+                    <ul>
+                        <li>OutputStream and FileOutputStream:</li>
+                    </ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+final int BLOCK_SIZE = 1024;
+OutputStream output = new FileOutputStream("myotherfile.txt");
+byte[] buffer = new byte[BLOCK_SIZE];
+boolean keepGoing = true;
+while (keepGoing) {
+    // fill up buffer with data
+    
+    output.write(buffer);
+    
+    // update keepGoing if we are done writing data
+}
+                    </code></pre>
+                </section>
+
+                <section data-transition="fade">
+                    <h2>Readers in Java</h2>
+                    <ul>
+                        <li>FileReader:  Reads characters (not bytes)</li>
+                        <li>BufferedReader:
+                            <ul>
+                                <li>Handles buffering</li>
+                                <li>Read line-by-line</li>
+                            </ul>
+                        </li>
+                        <li>Example:</li>
+                    </ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+FileReader fileReader = new FileReader("myotherfile.txt");
+BufferedReader input = new BufferedReader(fileReader);
+String line = null;
+while ((line = input.readLine()) != null) {
+    // do something with line
+}
+                    </code></pre>
+                </section>
+
+                <section data-transition="fade">
+                    <h2>Writers in Java</h2>
+                    <ul>
+                        <li>FileWriter:  Writes characters (not bytes)</li>
+                        <li>PrintWriter:
+                            <ul>
+                                <li>Write line-by-line</li>
+                                <li>e.g. System.out</li>
+                            </ul>
+                        </li>
+                        <li>Example:</li>
+                    </ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+PrintWriter output = new PrintWriter("myotherfile.txt");
+boolean keepGoing = true;
+String line = null;
+while (keepGoing) {
+    // update line with new data
+    
+    output.println(line);
+    
+    // update keepGoing, if no more data to save
+}
+output.close();
+                    </code></pre>
+                </section>
+
+                <section data-background="images/UOIT_background4.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Files and Streams</h1>
+					<h3 style="margin-left: 30%">Files</h3>
+				</section>
+
+                <section data-transition='fade'>
+					<h2>Files</h2>
+                    <ul>
+                        <li>File:
+                            <ul>
+                                <li>File::exists()</li>
+                                <li>File::isDirectory()</li>
+                                <li>File::mkdir(), File::mkdirs()</li>
+                                <li>File::renameTo(File)</li>
+                                <li>File::setLastModified(long)</li>
+                                <li>File::setReadOnly()</li>
+                                <li>File::File::toURL()</li>
+                                <li>File::File::canRead()</li>
+                                <li>File::File::canWrite()</li>
+                                <li>File::getAbsolutePath()</li>
+                            </ul>
+                        </li>
+                    </ul>
+				</section>
+
+                <section data-transition="fade">
+                    <h2>File</h2>
+                    <ul>
+                        <li>Example:</li>
+                    </ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+File outFile = new File("relativeFile.txt");
+File inFile = new File("/path/to/file/absoluteFile.txt");
+if (inFile.exists()) {
+    BufferedReader input = new BufferedReader(new FileReader(inFile));
+    PrintWriter output = new PrintWriter(outFile);
+    String line = null;
+    while ((line = input.readLine()) != null) {
+        output.println(line);
+    }
+    input.close();
+    output.close();
+}
+                    </code></pre>
+                </section>
+
+				<section data-background="images/UOIT_background4.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Files and Streams</h1>
+					<h3 style="margin-left: 30%">Scanner</h3>
+				</section>
+
+                <section>
+					<h2>Scanner</h2>
+					<ul>
+                        <li>Scanner:
+                            <ul>
+                                <li>Parses data values from any input stream or reader</li>
+                            </ul>    
+                        </li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+File inFile = new File("/path/to/file/absoluteFile.txt");
+Scanner scanner = new Scanner(inFile);
+while (scanner.hasNext()) {
+    String nextWord = scanner.next();
+}
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Scanner</h2>
+					<ul>
+                        <li>Scanner:
+                            <ul>
+                                <li>Values are separated by delimiters
+                                    <ul>
+                                        <li>By default, delimiters are whitespace characters</li>
+                                        <li>You can change them to anything you like</li>
+                                    </ul>
+                                </li>
+                            </ul>    
+                        </li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+File inFile = new File("/path/to/file/absoluteFile.txt");
+Scanner scanner = new Scanner(inFile);
+scanner.useDelimiter("[^0-9]"); // any non-digit characters
+while (scanner.hasNextInt()) {
+    int nextInt = scanner.nextInt();
+}
+                    </code></pre>
+				</section>
+
+				<section data-background="images/UOIT_background4.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Files and Streams</h1>
+					<h3 style="margin-left: 30%">Scanner</h3>
+				</section>
+
+                <section>
+					<h2>CSV</h2>
+					<ul>
+                        <li>Comma-separated values:
+                            <ul>
+                                <li>Values are separated by comma delimiters</li>
+                                <li>Spreadsheet programs (e.g. Calc, Excel) can export it</li>
+                                <li>Some open/API data is shared in this format
+                                    <ul>
+                                        <li><a href="http://opendata.toronto.ca/revenue/parking/ticket/parking_tickets_2014.zip">Toronto Parking Tickets</a></li>
+                                    </ul>
+                                </li>
+                            </ul>    
+                        </li>
+					</ul>
+					<pre><code class="hljs nohighlight" data-trim contenteditable>
+Name,Asmt1,Asmt2,Labs,Midterm,Final
+Bart Simpson,6.0,4.5,6.5,20.25,29.0
+Lisa Simpson,10.0,10.0,10.0,29.5,58.25
+Ralph Wiggum,0.5,0.25,0.75,8.0,12.5
+Homer Simpson,6.5,5.5,5.5,18.5,26.5
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Wrap-Up</h2>
+					<ul>
+						<li>In this section we learned about:
+							<ul>
+                                <li>Input and output streams</li>
+                                <li>Files</li>
+                                <li>Readers and writers</li>
+                                <li>Scanner</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+		<script src="js/uoit.js"></script>
+
+	</body>
+</html>

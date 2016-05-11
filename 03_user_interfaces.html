@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>User Interfaces - CSCI 2020u</title>
+
+        <link href="images/uoit_logo_icon_32.ico" rel="icon" type="image/x-icon"/>
+        <link href="images/uoit_logo_icon_32.ico" rel="shortcut icon" type="image/x-icon"/>
+
+		<meta name="description" content="A lecture on creating user interfaces" />
+		<meta name="author" content="Randy J. Fortier" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" id="theme" />
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/printable.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+				         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+					<h3 style="margin-left: 30%">Designing a UI for your application</h3>
+					<p style="margin-left: 30%">
+						<small>
+                            Randy J. Fortier<br />
+                            <a href="mailto:randy.fortier@uoit.ca">randy.fortier@uoit.ca</a><br />
+                            <a href="http://twitter.com/randy_fortier">@randy_fortier</a>
+                        </small>
+					</p>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Outline</h2>
+					<ul>
+                        <li>JavaFX</li>
+                        <li>User interface components</li>
+                        <li>Event handling</li>
+                        <li>FXML</li>
+                        <li>Canvas graphics</li>
+					</ul>
+				</section>
+
+				<section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+                    <h3 style="margin-left: 30%">JavaFX</h3>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>JavaFX</h2>
+					<ul>
+                        <li>A user interface library for Java
+                            <ul>
+                                <li>A replacement for Java Swing</li>
+                                <li>v1.0 introduced in 2008</li>
+                                <li>v8.0 integrated into Java SE</li>
+                            </ul>
+                        </li>
+                        <li>Features:
+                            <ul>
+                                <li>Modern look and feel, compared to Swing</li>
+                                <li>XML-based UI definitions</li>
+                                <li>Stylable controls (via CSS)</li>
+                                <li>2D graphics (v2.1+)</li>
+                                <li>3D graphics (v9.0+)</li>
+                            </ul>
+                        </li>
+					</ul>
+                    <aside class="notes">
+                        XML-based user interfaces are similar to web (HTML) and Android (layouts).
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>JavaFX</h2>
+                    <ul>
+                        <li>Core Objects:<br />
+                            <img src="images/03_user_interfaces/javafx-hierarchy.png" alt="Object hierarchy in JavaFX" />
+                        </li>
+                    </ul>
+                    <aside class="notes">
+                        Stage - top-level container representing a single UI window
+                        Scene - the group containing the actual user interface components
+                    </aside>
+				</section>
+                
+				<section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+					<h3 style="margin-left: 30%">UI Components</h3>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>JavaFX UI Components</h2>
+                    <ul>
+                        <li>Button - button
+                        <li>ButtonBar - a palette of buttons</li>
+                        <li>CheckBox - a boolean toggle button</li>
+                        <li>ChoiceBox - dropdown list</li>
+                        <li>ComboBox - editable, dropdown list</li>
+                        <li>Label - uneditable text</li>
+                        <li>Hyperlink - a clickable label</li>
+                        <li>PasswordField - a text field with hidden text</li>
+                    </ul>
+                    <aside class="notes">
+                    </aside>
+				</section>
+                
+				<section data-transition='fade'>
+					<h2>JavaFX UI Components (cont'd)</h2>
+                    <ul>
+                        <li>RadioButton - a choice button (grouped)</li>
+                        <li>Separator - visual line separator for buttons, etc.</li>
+                        <li>Slider - slide to pick a number (discrete or continuous)</li>
+                        <li>Spinner - number selector</li>
+                        <li>TextArea - multi-line text entry</li>
+                        <li>TextField - single-line text entry</li>
+                        <li>ToggleButton - button with an on/off state</li>
+                        <li>Toolbar - a horizontal or vertical toolbar</li>
+                    </ul>
+                    <aside class="notes">
+                    </aside>
+				</section>
+                
+				<section data-transition='fade'>
+					<h2>JavaFX Layouts</h2>
+                    <ul>
+                        <li>BorderPane - group with N,S,W,E, and Centre</li>
+                        <li>FlowPlane - a word-wrapped pane</li>
+                        <li>GridPane - a grid-oriented group</li>
+                        <li>HBox - horizontal linear layout</li>
+                        <li>VBox - vertical linear layout</li>
+                    </ul>
+                    <aside class="notes">
+                        BorderPane - attach components to each of the sides, with a larger component in the middle
+                        FlowPane - organized (by default) left to right, top to bottom (if there is room)
+                        GridPane - rows and columns of components
+                        HBox - horizontal grouping (e.g. toolbar)
+                        VBox - vertical grouping (e.g. palette)
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Higher-level Controls</h2>
+                    <ul>
+                        <li>ProgressBar - horizontal bar showing progress</li>
+                        <li>ProgressIndicator - circular control showing activity</li>
+                        <li>ScrollPane - adds a scroll bar to a UI</li>
+                        <li>WebView - shows a web page</li>
+                    </ul>
+                    <aside class="notes">
+                        ProgressBar - when you know how long it is going to take (effort)
+                        ProgressIndicator - when you just want the user to know you are working on it
+                        WebView - can run scripts, etc.
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Popups and Choosers</h2>
+                    <ul>
+                        <li>Alert - popup window</li>
+                        <li>ColorPicker - colour chooser</li>
+                        <li>DatePicker - date chooser</li>
+                    </ul>
+                    <aside class="notes">
+                        Alert - simple popup dialog
+                        ColorPicker - displays a palette of colours, can choose custom colour
+                        DatePicker - displays a calendar view
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Grouping Elements</h2>
+                    <ul>
+                        <li>ListView - a vertical list of items</li>
+                        <li>SplitPane - a horizontal or vertical dual panel</li>
+                        <li>TabPane - a group of stacked UIs, with tabs to select between them</li>
+                        <li>Tab - individual tab/page in a tab panel</li>
+                    </ul>
+                    <aside class="notes">
+                        ListView - elements of the list can be layouts or any UI component
+                        SplitPane - vertical or horizontal splits (resizable)
+                        TabPane + Tabs - switch between user interface parts
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Menus</h2>
+                    <ul>
+                        <li>MenuBar - the horizontal menu bar</li>
+                        <li>Menu - menus and submenus</li>
+                        <li>ContextMenu - popup menu</li>
+                        <li>MenuItem - normal menu item (icons,shortcuts,accel)</li>
+                        <li>CheckMenuItem - checkable menu item</li>
+                        <li>RadioMenuItem - choice menu item</li>
+                    </ul>
+                    <aside class="notes">
+                        MenuBar - shows across the top (menus are named)
+                        Menu - menus on the menu bar, or sub-menus of other menus
+                        ContextMenu - shows up anywhere (e.g. right click)
+                        menu items - can handle accelerators/short cut keys, with icons and/or text
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Trees</h2>
+                    <ul>
+                        <li>TreeView - view hierarchical data in a tree</li>
+                        <li>TreeTableView - table with collapsible sections</li>
+                        <li>TreeItem - normal tree item</li>
+                        <li>CheckBoxTreeItem - checkable tree item</li>
+                    </ul>
+                    <aside class="notes">
+                        TreeViews show hierarchical data
+                        TreeTableView shows tables of hierarchically structured data
+                          e.g. a tablet showing marks of students in different classes, can collapse classes
+                        items - can be different types (like menu items)
+                    </aside>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Tables</h2>
+                    <ul>
+                        <li>Table</li>
+                        <li>TableColumn</li>
+                        <li>CellFactory</li>
+                        <li>CellValueFactory</li>
+                        <li>PropertyValueFactory</li>
+                    </ul>
+                    <aside class="notes">
+                        Table - provides sorting, reordering, editing
+                              - maintains a separate data source (model)
+                        CellFactory - determines how to show the data (e.g. in a Label)
+                        CellValueFactory - how to get the value for a cell
+                        PropertyValueFactory - a CVF that gets the value from a property of an object
+                    </aside>
+				</section>
+
+                <section>
+					<h2>Basic JavaFX Program</h2>
+					<pre><code class="hljs java" data-trim contenteditable>
+public class Main extends Application {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("JavaFX Demo");
+
+        Scene scene = new Scene(layout, 600, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+                    </code></pre>
+				</section>
+
+				<section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+					<h3 style="margin-left: 30%">Event Handling</h3>
+				</section>
+
+                <section>
+					<h2>Handling Events</h2>
+					<ul>
+                        <li>You can handle events in code:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+Button addButton = new Button("Insert");
+addButton.setOnAction(new EventHandler&lt;ActionEvent&gt;() {
+    @Override public void handle(ActionEvent e) {
+        String firstName = firstNameField.getText();
+        // handle the event
+    }
+});
+                    </code></pre>
+				</section>
+
+                <section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+					<h3 style="margin-left: 30%">FXML</h3>
+				</section>
+                
+                <section>
+					<h2>FXML</h2>
+					<ul>
+                        <li>FX Markup Language</li>
+                        <li>XML-based syntax for declaring user interfaces
+                            <ul>
+                                <li>Similar syntax to HTML and Android layouts</li>
+                            </ul>
+                        </li>
+                        <li>A Controller class
+                            <ul>
+                                <li>Initialization</li>
+                                <li>Event handlers</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <aside class="notes">
+                        FXML - uses a syntax familiar to web and Android developers
+                        Controller - optional
+                        - include if you have to populate a control (e.g. list of provinces)
+                        - include if you have to handle events (e.g. selections from the list)
+                    </aside>
+                </section>
+                
+                <section>
+					<h2>Sample FXML</h2>
+					<ul>
+                        <li>The following is a sample FXML file:</li>
+					</ul>
+					<pre><code class="hljs xml" data-trim contenteditable>
+&lt;BorderPane xmlns="http://javafx.com/javafx/8" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="sample.Controller"&gt;
+        
+    &lt;top&gt;
+        &lt;Label fx:id="firstNameLabel"
+               text="First name:" /&gt;
+    &lt;/top&gt;
+    &lt;center&gt;
+        &lt;TextField fx:id="firstNameField" /&gt;
+    &lt;/center&gt;
+    &lt;bottom&gt;
+        &lt;Button text="Next" 
+                onAction="#next"/&gt;
+    &lt;/bottom&gt;
+&lt;/BorderPane&gt;
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Sample Controller</h2>
+					<ul>
+                        <li>The following is a sample controller class:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+public class Controller {
+    @FXML private Label firstNameLabel;
+    @FXML private TextField firstNameField;
+
+    public void next(ActionEvent e) {
+        // handle the event
+    }
+}
+                    </code></pre>
+				</section>
+
+                <section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+					<h3 style="margin-left: 30%">2D Graphics</h3>
+				</section>
+                
+                <section>
+					<h2>Canvas</h2>
+					<ul>
+                        <li>Similar to Canvas in HTML5 and Android:
+							<ul>
+								<li>Drawing basic shapes</li>
+                                <li>Drawing images</li>
+								<li>Animation</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Basic Drawing</h2>
+					<ul>
+						<li>The skeleton code:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+@FXML private Canvas canvas;
+
+@Override
+public void start(Stage primaryStage) throws Exception{
+    Group root = new Group();
+    Scene scene = new Scene(root, 800, 600, Color.LIGHTGRAY);
+
+    canvas = new Canvas();
+    canvas.widthProperty().bind(primaryStage.widthProperty());
+    canvas.heightProperty().bind(primaryStage.heightProperty());
+
+    root.getChildren().add(canvas);
+    primaryStage.setScene(scene);
+    primaryStage.show();
+
+    draw(root); // the good stuff happens here
+}
+                    </code></pre>
+				</section>
+                
+				<section>
+					<h2>Basic Drawing</h2>
+					<ul>
+						<li>Now we can draw basic shapes:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    gc.setStroke(Color.BLUE);
+    gc.fillRect(50, 50, 100, 75);
+
+    gc.setFill(Color.BLUE);
+    gc.fillRect(250, 50, 100, 75);
+}
+                    </code></pre>
+				</section>
+
+				
+				<section>
+					<h2>Basic Shapes</h2>
+					<ul>
+						<li>Lines:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+    gc.setStroke(Color.BLUE);
+
+    gc.strokeLine(50, 50, 150, 250);
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Basic Shapes</h2>
+					<ul>
+						<li>Rectangular shapes:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    gc.setFill(Color.BLUE);
+    gc.setStroke(Color.BLUE);
+
+    gc.fillRect(250, 50, 100, 75);
+    gc.strokeRect(250, 175, 100, 75);
+
+    gc.fillRoundRect(450, 50, 100, 75, 10, 10);
+    gc.strokeRoundRect(450, 175, 100, 75, 20, 20);
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Basic Shapes</h2>
+					<ul>
+						<li>Round shapes:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    gc.strokeOval(650, 50, 100, 75);
+    gc.fillOval(650, 175, 100, 75);
+
+    gc.strokeArc(50, 350, 100, 75, 115.0, 45.0, ArcType.ROUND);
+    gc.fillArc(50, 500, 100, 75, 45.0, 115.0, ArcType.ROUND);
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Basic Shapes</h2>
+					<ul>
+						<li>Polygons:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    gc.strokePolygon(new double[] {250, 310, 300, 250}, 
+                     new double[] {350, 360, 380, 400}, 4);
+    gc.fillPolygon(new double[] {250, 310, 300, 250}, 
+                     new double[] {500, 510, 530, 550}, 4);
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Basic Shapes</h2>
+					<ul>
+						<li>Text:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    Font font = new Font("Arial", 24);
+    gc.setFont(font);
+    gc.strokeText("CSCI2020u", 450, 400);
+    gc.fillText("CSCI2020u", 450, 550);
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Drawing Images</h2>
+					<ul>
+						<li>Images:</li>
+					</ul>
+					<pre><code class="hljs java" data-trim contenteditable>
+private void draw(Group group) {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    Image image = new Image("picture.png");
+    gc.drawImage(image, 200, 300);
+}
+                    </code></pre>
+				</section>
+
+				<section data-background="images/UOIT_background3.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">User Interfaces</h1>
+					<h3 style="margin-left: 30%">Animation</h3>
+				</section>
+
+                <section>
+					<h2>Animation</h2>
+					<ul>
+						<li>Animation involves a timed loop</li>
+                        <li>Choose a frames-per-second value</li>
+                        <li>Set the timer callback, accordingly</li>
+                        <li>Implement a callback function that draws a single frame</li>
+					</ul>
+				</section>
+
+                <section>
+					<h2>Animation</h2>
+					<pre><code class="hljs java" style="font-size: 85%" data-trim contenteditable>
+@Override
+public void start(Stage primaryStage) throws Exception{
+    ...
+    Timeline timeline = new Timeline();
+    timeline.setCycleCount(Timeline.INDEFINITE);
+    EventHandler eventHandler = new EventHandler&lt;ActionEvent&gt;() {
+        @Override
+        public void handle(ActionEvent e) {
+            gc.setFill(Color.LIGHTGRAY);
+            gc.fillRect(x, y, 200, 300);
+            // increment x offset and y offset
+        }
+    });
+    KeyFrame keyFrame = new KeyFrame(Duration.millis(50), eventHandler);
+    timeline.getKeyFrames().add(keyFrame);
+    timeline.playFromStart();
+    ...
+}
+                    </code></pre>
+					<aside class="notes">
+                        The 50 in this example is the delay, in ms. This corresponds to about 20fps.
+                    </aside>
+				</section>
+
+				<section>
+					<h2>Wrap-Up</h2>
+					<ul>
+						<li>In this section we learned about:
+							<ul>
+								<li>JavaFX
+                                    <ul>
+                                        <li>Skeleton code</li>
+                                        <li>Basic controls</li>
+                                        <li>High-level controls</li>
+                                        <li>Layouts and groups</li>
+                                        <li>Event handling</li>
+                                        <li>FXML</li>
+                                        <li>2D graphics</li>
+                                        <li>Animation</li>
+                                    </ul>
+                                </li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+		<script src="js/uoit.js"></script>
+
+	</body>
+</html>

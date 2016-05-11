@@ -1,0 +1,2 @@
+;; Analyzed by ClojureScript 1.7.170
+{:name boot.cljs.main670, :doc nil, :excludes #{}, :use-macros nil, :require-macros nil, :uses nil, :requires {d3-cljs.core d3-cljs.core, d3-cljs.events d3-cljs.events, d3-cljs.fractal-tree d3-cljs.fractal-tree}, :imports nil}

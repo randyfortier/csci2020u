@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>LibGDX - CSCI 2020u</title>
+
+        <link href="images/uoit_logo_icon_32.ico" rel="icon" type="image/x-icon"/>
+        <link href="images/uoit_logo_icon_32.ico" rel="shortcut icon" type="image/x-icon"/>
+
+		<meta name="description" content="A lecture on reading from and writing to file" />
+		<meta name="author" content="Randy J. Fortier" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" id="theme" />
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/printable.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section data-background="images/UOIT_background2.png"
+                         data-background-size="70%"
+				         data-transition='fade'>
+					<h1 style="margin-left: 30%">LibGDX</h1>
+					<h3 style="margin-left: 30%">Java Game Library</h3>
+					<p style="margin-left: 30%">
+						<small>
+                            Randy J. Fortier<br />
+                            <a href="mailto:randy.fortier@uoit.ca">randy.fortier@uoit.ca</a><br />
+                            <a href="http://twitter.com/randy_fortier">@randy_fortier</a>
+                        </small>
+					</p>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Outline</h2>
+					<ul>
+                        <li>LibGDX game library
+                            <ul>
+                                <li>Graphics</li>
+                                <li>Physics</li>
+                                <li>Controls</li>
+                                <li>Audio</li>
+                                <li>AI</li>
+                            </ul>
+                        </li>
+					</ul>
+				</section>
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background2.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h1 style="margin-left: 30%">LibGDX</h1>
+                        <h3 style="margin-left: 30%">Overview</h3>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Multi-platform:
+                                <ul>
+                                    <li>Windows, Mac OS-X, Linux</li>
+                                    <li>Android</li>
+                                    <li>iOS</li>
+                                    <li>Web (HTML5)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Graphics: Built on OpenGL</li>
+                            <li>Physics: Box2D</li>
+                            <li>Controls: Custom</li>
+                            <li>Audio: Custom</li>
+                            <li>AI: Custom</li>
+                        </ul>
+                    </section>
+                </section>
+                
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background2.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h1 style="margin-left: 30%">LibGDX</h1>
+                        <h3 style="margin-left: 30%">Graphics</h3>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Textures
+                                <ul>
+                                    <li>Loading of image formats</li>
+                                    <li>Scaling, rotation, translation, flipping</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Texture playerTexture = new Texture("images/hero.png");
+SpriteBatch batch = new SpriteBatch();
+float x = 100;
+float y = 100;
+batch.begin();
+batch.draw(playerTexture, x, y);
+batch.end();
+
+                        </code></pre>
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Textures
+                                <ul>
+                                    <li>Drawing only part of an image</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Texture spriteSheetTexture = new Texture("images/sprite_sheet.png");
+SpriteBatch batch = new SpriteBatch();
+float x = 100, y = 100;
+float centreX = 50, centreY = 50;
+float width = 100, height = 100;
+float scaleX = 1.0f, scaleY = 1.0f;
+float rotation = 1.0f;
+float srcX = 0, srcY = 0;
+float srcWidth = 100, srcHeight = 100;
+boolean flipX = false, flipY = false;
+batch.begin();
+batch.draw(spriteSheetTexture, x, y, centreX, centreY, width, height, 
+           scaleX, scaleY, rotation, 
+           srcX, srcY, srcWidth, srcHeight, flipX, false);
+batch.end();
+
+                        </code></pre>
+                    </section>
+                </section>
+                
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background2.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h1 style="margin-left: 30%">LibGDX</h1>
+                        <h3 style="margin-left: 30%">Physics</h3>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Box2D
+                                <ul>
+                                    <li>Linear acceleration and velocity</li>
+                                    <li>Angular acceleration and velocity</li>
+                                    <li>Gravity and mass</li>
+                                    <li>Collisions and transfer of momentum</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>World
+                                <ul>
+                                    <li>Manages all of the bodies</li>
+                                </ul>
+                            </li>
+                            <li>Bodies
+                                <ul>
+                                    <li>Location</li>
+                                    <li>Density (size + density -> mass)</li>
+                                    <li>Shape representation (e.g. box)</li>
+                                    <li>Dynamic (does it move?)</li>
+                                    <li>Fixed rotation (does it rotate?)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>World
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+World world = new World(new Vector2(0, -9.8f), false);
+                        </code></pre>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Bodies
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Body physicsBody;
+
+BodyDef bodyDefinition = new BodyDef();
+bodyDefinition.type = BodyDef.BodyType.DynamicBody;
+bodyDefinition.position.set(x, y);
+bodyDefinition.fixedRotation = true;
+physicsBody = world.createBody(bodyDefinition);
+
+PolygonShape shape = new PolygonShape();
+shape.setAsBox(width, height);
+Fixture fixture = physicsBody.createFixture(shape, 1f);
+shape.dispose();
+
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background2.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h1 style="margin-left: 30%">LibGDX</h1>
+                        <h3 style="margin-left: 30%">Controls</h3>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Keyboard
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+KeyboardHandler keyboardHandler = new KeyboardHandler(this);
+Gdx.input.setInputProcessor(keyboardHandler);
+...
+public class KeyboardHandler implements InputProcessor {
+    @Override
+    public boolean keyDown(int keycode) {
+        if (keycode == Input.Keys.LEFT) {
+            game.moveLeft();
+        } else if (keycode == Input.Keys.RIGHT) {
+            game.moveRight();
+        }
+        ...
+    }
+    ...
+}
+
+                        </code></pre>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Touch screen
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+TouchHandler touchHandler = new TouchHandler(this);
+Gdx.input.setInputProcessor(touchHandler);
+...
+public class TouchHandler implements InputProcessor {
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        game.jump();
+        ...
+    }
+    ...
+}
+                        </code></pre>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Gamepad/controllers
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+ControllerHandler controllerHandler = new ControllerHandler(this);
+Controllers.addListener(controllerHandler);
+...
+public class ControllerHandler implements ControllerListener {
+    @Override
+    public boolean buttonDown(Controller controller, int buttonCode) {
+        if (buttonCode == 0) {
+            game.jump();
+        }
+        ...
+    }
+    ...
+}
+                        </code></pre>
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Accelerometer (for mobile)
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)) {
+    float accelY = Gdx.input.getAccelerometerY();
+    System.out.println("accelY = " + accelY);
+    if (accelY &gt; 1f) {
+        moveRight();
+    } else if (accelY &lt; -1f){
+        moveLeft();
+    }
+}
+                        </code></pre>
+                    </section>
+                    
+                </section>
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background2.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h1 style="margin-left: 30%">LibGDX</h1>
+                        <h3 style="margin-left: 30%">Audio</h3>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Sounds
+                                <ul>
+                                    <li>Many media types supported (e.g. .wav, .mp3, .ogg)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Sound sound = Gdx.audio.newSound(Gdx.files.internal("effect.wav"));
+...
+sound.play();
+                        </code></pre>
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Music
+                                <ul>
+                                    <li>Buffered for larger audio streams</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Music music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
+music.setLooping(true);
+music.play();
+                        </code></pre>
+                    </section>
+                </section>
+
+             <section data-transition='fade'>
+                    <section data-background="images/UOIT_background2.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h1 style="margin-left: 30%">LibGDX</h1>
+                        <h3 style="margin-left: 30%">Artificial Intelligence</h3>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Steering behaviour
+                                <ul>
+                                    <li>Seek - attempts to crash into a target</li>
+                                    <li>Flee - moves away from a target</li>
+                                    <li>Pursue - attempts to intercept a target</li>
+                                    <li>Evade - attemps to avoid interception</li>
+                                    <li>Arrive - attempts to stop at a target</li>
+                                    <li>Face - attempts to face toward a target</li>
+                                    <li>Wander - random motion</li>
+                                    <li>FollowPath - follow a prescribed path</li>
+                                    <li>Interpose - predict future position and aim to intersect with this path</li>
+                                </ul>
+                            </li>
+                            <li>Formation motion</li>
+                        </ul>
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Steerable
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+public class FollowEntity extends SteerableAdapter {
+    public void update(float delta) {
+        behaviour.calculateSteering(steeringOutput);
+
+        if (!steeringOutput.linear.isZero()) {
+            Vector2 force = steeringOutput.linear.scl(delta);
+            body.applyForceToCenter(force, true);
+        }
+    }
+    ...
+}
+                        </code></pre>
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>LibGDX</h2>
+                        <ul>
+                            <li>Arrive
+                            </li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Arrive&lt;Vector2&gt; arrive = new Arrive&lt;&gt;(followerEntity, followedEntity);
+arrive.setTimeToTarget(0.01f);
+arrive.setArrivalTolerance(2f);
+arrive.setDecelerationRadius(200f);
+followerEntity.setBehaviour(arrive);
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+					<h2>Wrap-Up</h2>
+					<ul>
+						<li>In this section we learned about:
+							<ul>
+                                <li>LibGDX
+                                    <ul>
+                                        <li>Graphics</li>
+                                        <li>Physics (Box2D)</li>
+                                        <li>Controls</li>
+                                        <li>Audio</li>
+                                        <li>AI</li>
+                                    </ul>
+                                </li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+		<script src="js/uoit.js"></script>
+
+	</body>
+</html>

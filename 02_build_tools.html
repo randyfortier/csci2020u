@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Build Tools - CSCI 2020u</title>
+
+        <link href="images/uoit_logo_icon_32.ico" rel="icon" type="image/x-icon"/>
+        <link href="images/uoit_logo_icon_32.ico" rel="shortcut icon" type="image/x-icon"/>
+
+        <meta name="description" content="A lecture on build tools" />
+		<meta name="author" content="Randy J. Fortier" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" id="theme" />
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/printable.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section data-background="images/UOIT_background2.png"
+                         data-background-size="70%"
+				         data-transition='fade'>
+					<h1 style="margin-left: 30%">Build Tools</h1>
+					<h3 style="margin-left: 30%">Optimizing the Build Process</h3>
+					<p style="margin-left: 30%">
+						<small>
+                            Randy J. Fortier<br />
+                            <a href="mailto:randy.fortier@uoit.ca">randy.fortier@uoit.ca</a><br />
+                            <a href="http://twitter.com/randy_fortier">@randy_fortier</a>
+                        </small>
+					</p>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Outline</h2>
+					<ul>
+						<li>What are build tools?</li>
+                        <li>What can build tools do for me?</li>
+                        <li>An introduction to Gradle</li>
+                        <li>Incorporating 3rd party tools into the build cycle</li>
+					</ul>
+				</section>
+
+				<section data-background="images/UOIT_background2.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Build Tools</h1>
+                    <h3 style="margin-left: 30%">What are build tools?</h3>
+                    <h3 style="margin-left: 30%">Why use build tools?</h3>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Build Tools</h2>
+					<ul>
+                        <li>A build tool is a software package that automates the build process
+                            <ul>
+                                <li>Make</li>
+                                <li>Rake</li>
+                                <li>Ant, NAnt</li>
+                                <li>Maven</li>
+                                <li>Grunt</li>
+                                <li>Gradle</li>
+                            </ul>
+                        </li>
+					</ul>
+				</section>
+
+                <section>
+					<h2>make</h2>
+                    <div><i>makefile:</i></div>
+					<pre><code class="hljs makefile" data-trim contenteditable>
+all: prog lib1 lib2
+
+prog:
+   g++ -Wall prog.cpp -o prog
+
+lib1:
+   g++ -Wall lib1.cpp -o lib1.o
+
+lib2:
+   g++ -Wall lib2.cpp -o lib2.o
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Rake</h2>
+                    <div><i>rakefile:</i></div>
+					<pre><code class="hljs ruby" data-trim contenteditable>
+file 'prog' => 'prog.cpp' do
+  sh 'g++ -Wall prog.cpp -o prog'
+end
+file 'lib1.o' => 'lib1.cpp' do
+  sh 'g++ -Wall lib1.cpp -o lib1.o'
+end
+file 'lib2.o' => 'lib2.cpp' do
+  sh 'g++ -Wall lib2.cpp -o lib2.o'
+end
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Ant</h2>
+                    <div><i>build.xml:</i></div>
+					<pre><code class="hljs xml" data-trim contenteditable>
+&lt;project&gt;
+  &lt;target name="compile"&gt;
+    &lt;javac srcdir="src" destdir="build/classes"/&gt;
+  &lt;/target&gt;
+  &lt;target name="jar"&gt;
+    &lt;mkdir dir="build/jar"/&gt;
+    &lt;jar destfile="build/jar/MyApp.jar" basedir="build/classes"&gt;
+      &lt;manifest&gt;
+        &lt;attribute name="Main-Class" value="pkg.MainApp" /&gt;
+      &lt;/manifest&gt;
+    &lt;/jar&gt;
+  &lt;/target&gt;
+  &lt;target name="run"&gt;
+    &lt;java jar="build/jar/MyApp.jar" fork="true" /&gt;
+  &lt;/target&gt;
+&lt;/project&gt;
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Maven</h2>
+					<ul>
+                        <li>Maven is quite a different build tool than make, rake, and ant
+                            <ul>
+                                <li>It handles libraries/dependencies</li>
+                            </ul>
+                        </li>
+                        <li>Maven keeps track of a large repository of libraries that you can link to and use in your application
+                            <ul>
+                                <li>Dependencies are downloaded automatically</li>
+                                <li>It is declarative, rather than imperative</li>
+                                <li>We don’t necessarily declare the steps to do something, just declare that we want it done</li>
+                            </ul>
+                        </li>
+					</ul>
+				</section>
+
+                <section>
+					<h2>Maven</h2>
+                    <div><i>pom.xml:</i></div>
+					<pre><code class="hljs xml" data-trim contenteditable>
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;groupId&gt;ca.uoit.myApp&lt;/groupId&gt;
+  &lt;artifactId&gt;myApp&lt;/artifactId&gt;
+  &lt;version&gt;1.0&lt;/version&gt;
+  &lt;packaging&gt;jar&lt;/packaging&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;junit&lt;/groupId&gt;
+      &lt;artifactId&gt;junit&lt;/artifactId&gt;
+      &lt;version&gt;4.10.0&lt;/version&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/project&gt;
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Maven Projects</h2>
+					<ul>
+                        <li>The pom.xml is called the Project Object Model</li>
+                        <li>The directory structure of your project should match:</li>
+					</ul>
+					<pre><code class="hljs nohighlight" data-trim contenteditable>
+myApp
+   pom.xml
+   src
+      main
+         java
+      test
+         java
+                    </code></pre>
+				</section>
+
+                <section>
+					<h2>Grunt</h2>
+                    <ul>
+                        <li>Declarative 'build' tool (like Maven)
+                            <ul>
+                                <li>Dependency management (e.g. libraries)</li>
+                                <li>Automated tasks</li>
+                            </ul>
+                        </li>
+                        <li>Used in Node.js projects (server-side JavaScript)</li>
+                    </ul>
+					<pre><code class="hljs javascript" data-trim contenteditable>
+module.exports = function(grunt) {
+
+  grunt.initConfig({
+    jshint: {
+      files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
+      options: {
+        globals: {
+          jQuery: true
+        }
+      }
+    },
+    watch: {
+      files: ['<%= jshint.files %>'],
+      tasks: ['jshint']
+    }
+  });
+
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
+  grunt.registerTask('default', ['jshint']);
+
+};
+                    </code></pre>
+				</section>
+				
+                <section>
+					<h2>Bower</h2>
+                    <ul>
+                        <li>Declarative 'build' tool (like Maven)
+                            <ul>
+                                <li>Dependency management</li>
+                                <li>Automated tasks</li>
+                            </ul>
+                        </li>
+                        <li>Client-side JavaScript</li>
+                    </ul>
+					<pre><code class="hljs json" data-trim contenteditable>
+{
+  "name": "myApp",
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "~2.1.4"
+  },
+  "private": true
+}
+                    </code></pre>
+				</section>
+				
+				<section data-background="images/UOIT_background2.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Build Tools</h1>
+					<h3 style="margin-left: 30%">Gradle Basics</h3>
+				</section>
+
+                <section>
+					<h2>Gradle</h2>
+					<ul>
+                        <li>Gradle combines the best of Ant and Maven into a single tool:
+                            <ul>
+                                <li>The ability to create your own tasks (Ant)</li>
+                                <li>The management of dependencies (Maven)</li>
+                                <li>A declarative syntax (Maven)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+                
+                <section>
+					<h2>Gradle</h2>
+                    <ul>
+                        <li>Gradle also other advantages:
+                            <ul>
+                                <li>It doesn’t use the cumbersome XML syntax that Ant and Maven use</li>
+                                <li>Instead, Gradle uses Groovy
+                                    <ul>
+                                        <li>Groovy is a programming language, inspired by Java</li>
+                                        <li>Groovy is compiled into bytecodes, and can be run in the JVM</li>
+                                    </ul>
+                                </li>
+                                <li>Writing custom tasks is easy</li>
+                            </ul>
+                        </li>
+					</ul>
+				</section>
+
+                <section>
+					<h2>Imperative vs. Declarative</h2>
+                    <ul>
+                        <li>Imperative:  
+                            <ol>
+                                <li>Clean project</li>
+                                <li>Compile source code</li>
+                                <li>Put distribution into an archive</li>
+                                <li>...</li>
+                            </ol>
+                        </li>
+                        <li>Declarative:
+                            <ul>
+                                <li>Here is what I want to do</li>
+                            </ul>
+                        </li>
+					</ul>
+				</section>
+
+                <section>
+					<h2>Gradle Projects</h2>
+					<ul>
+                        <li>The directory structure is identical to a Maven project:</li>
+					</ul>
+					<pre><code class="hljs nohighlight" data-trim contenteditable>
+myApp
+   build.gradle
+   src
+      main
+         java
+      test
+         java
+                    </code></pre>
+				</section>
+
+				<section>
+					<h2>Gradle Files</h2>
+					<ul>
+                        <li>settings.gradle
+							<ul>
+								<li>This file is optional</li>
+								<li>Properties (e.g. project name)</li>
+							</ul>
+						</li>
+                        <li>gradle.build
+							<ul>
+								<li>Custom build tasks</li>
+								<li>Import plug-ins</li>
+								<li>Dependencies</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Custom Tasks</h2>
+					<ul>
+						<li>Defining a task occurs in a Groovy closure (basically, a function):</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+task(sayHello) {
+   doLast {
+      println "Hello from a custom task!"
+   }
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Dependent Tasks</h2>
+					<ul>
+						<li>Tasks can require that other tasks be executed, first:</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+task(sayHello) {
+   doLast {
+      println "Hello from a custom task!"
+   }
+}
+
+task(howAreYou, dependsOn: 'sayHello') {
+   doLast {
+      println "How are you?"
+   }
+}
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>Dependencies</h2>
+					<ul>
+						<li>Any libraries your project needs are called dependencies</li>
+						<li>Like Maven, Gradle manages those dependencies for you
+							<ul>
+								<li>Gradle can even use Maven's repository, Maven Central</li>
+							</ul>
+						</li>
+						<li>This build script declares a dependency on Apache's Commons Validator</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'commons-validator', 
+            name: 'commons-validator', 
+            version: '1.4.1'
+}
+                    </code></pre>
+					<aside class="notes">Gradle will automatically download this library before compilation, since we have added this dependency to the 'compile' aspect of the build.</aside>
+				</section>
+
+				<section>
+					<h2>Plug-ins</h2>
+					<ul>
+						<li>Gradle has many useful plug-ins:
+							<ul>
+								<li>java</li>
+								<li>android</li>
+								<li>scala</li>
+								<li>groovy</li>
+							</ul>
+						</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+apply plugin: 'java'
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>The 'java' Plug-in</h2>
+					<ul>
+						<li>The 'java' plug-in adds several tasks:
+							<ul>
+								<li>classes: Generates classfiles</li>
+								<li>jar: Creates a JAR file</li>
+								<li>javadoc:  Generate JavaDoc documentation from source files</li>
+							</ul>
+						</li>
+					</ul>
+					<pre><code class="hljs bash" data-trim contenteditable>
+$ gradle classes
+:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+
+BUILD SUCCESSFUL
+
+Total time: 3.913 secs
+                    </code></pre>
+				</section>
+
+				<section>
+					<h2>Configuring Tasks</h2>
+					<ul>
+						<li>Let's customize the 'jar' task that comes with the 'java' plug-in:</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+sourceCompatibility = 1.7
+version = '1.0'
+jar {
+    manifest {
+        attributes  'Main-Class': 'Test',
+                    'Implementation-Title': 'Sample-Gradle',
+                    'Implementation-Version': version
+    }
+}
+                    </code></pre>
+				</section>
+
+				<section>
+					<h2>Task Types</h2>
+					<ul>
+						<li>Tasks can also be assigned types
+							<ul>
+								<li>Task types indicate what Java class (if any) should implement the task</li>
+								<li>Task types, therefore, have an effect similar to inheritance</li>
+							</ul>
+						</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+task(run, dependsOn: 'classes', type: JavaExec) {
+    main = 'Test'
+    classpath = sourceSets.main.runtimeClasspath
+}
+                    </code></pre>
+				</section>
+
+				<section>
+					<h2>Configuration</h2>
+					<ul>
+						<li>Normally, goes in settings.gradle</li>
+						<li>Can also put settings in gradle.properties</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+rootProject.name = 'Sample-Gradle'
+                    </code></pre>
+				</section>
+
+				<section data-background="images/UOIT_background2.png"
+                         data-background-size="70%"
+                         data-transition='fade'>
+					<h1 style="margin-left: 30%">Build Tools</h1>
+					<h3 style="margin-left: 30%">Integrating external tools into the build</h3>
+				</section>
+                
+				<section>
+					<h2>Minification and Obfuscation</h2>
+					<ul>
+						<li>Minification
+							<ul>
+								<li>Reduces the size of generated classfiles</li>
+							</ul>
+						</li>
+						<li>Obfuscation
+							<ul>
+								<li>Changes variable/function names to make the code harder to read if decompiled</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>ProGuard</h2>
+					<ul>
+						<li>Use ProGuard within Gradle:</li>
+					</ul>
+					<pre><code class="hljs groovy" data-trim contenteditable>
+buildscript {
+   repositories {
+      flatDir dirs: 'C:/Dev/proguard5.2.1/lib'
+   }
+   dependencies {
+      classpath ':proguard'
+   }
+}
+
+task (minify, dependsOn: 'jar', type: proguard.gradle.ProGuardTask) {
+   configuration 'proguard.cfg'
+    
+   injars 'build/libs/Sample-Gradle-1.0.jar'
+   outjars 'build/libs/Sample-Gradle-1.0.min.jar'
+}
+
+                    </code></pre>
+				</section>
+				
+				<section>
+					<h2>ProGuard</h2>
+					<ul>
+						<li>Configure ProGuard:</li>
+					</ul>
+					<pre><code class="hljs nohighlight" data-trim contenteditable>
+-libraryjars  &lt;java.home&gt;/lib/rt.jar
+-printmapping sample_gradle.map
+-keep public class myapp.Test {
+    public static void main(java.lang.String[]);
+}
+-keep public class myapp.data.Message { *; }
+-dontwarn
+                    </code></pre>
+				</section>
+				
+                <section>
+                    <h2>Wrap-Up</h2>
+                    <ul>
+                        <li>In this section, we learned about:
+                            <ul>
+                                <li>What build tools are, and why should we use them</li>
+                                <li>How to implement a Gradle build for a Java project</li>
+                                <li>How to use external tools within our build:
+                                    <ul>
+                                        <li>e.g. obfuscation</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+		<script src="js/uoit.js"></script>
+
+	</body>
+</html>

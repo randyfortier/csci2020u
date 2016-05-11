@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>TCP, UDP, and Sockets - CSCI 2020u</title>
+
+        <link href="images/uoit_logo_icon_32.ico" rel="icon" type="image/x-icon"/>
+        <link href="images/uoit_logo_icon_32.ico" rel="shortcut icon" type="image/x-icon"/>
+
+		<meta name="description" content="A lecture on reading from and writing to file" />
+		<meta name="author" content="Randy J. Fortier" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/theme/black.css" id="theme" />
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/printable.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section data-background="images/UOIT_background5.png"
+                         data-background-size="70%"
+				         data-transition='fade'>
+					<h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+					<h3 style="margin-left: 30%">Writing Network Programs</h3>
+					<p style="margin-left: 30%">
+						<small>
+                            Randy J. Fortier<br />
+                            <a href="mailto:randy.fortier@uoit.ca">randy.fortier@uoit.ca</a><br />
+                            <a href="http://twitter.com/randy_fortier">@randy_fortier</a>
+                        </small>
+					</p>
+				</section>
+
+				<section data-transition='fade'>
+					<h2>Outline</h2>
+					<ul>
+                        <li>TCP
+                            <ul>
+                                <li>Ports</li>
+                                <li>Handshake</li>
+                                <li>Windowing</li>
+                                <li>Checksum</li>
+                                <li>Packet Format</li>
+                            </ul>
+                        </li>
+                        <li>UDP
+                            <ul>
+                                <li>Packet Format</li>
+                            </ul>
+                        </li>
+                        <li>Socket Programming
+                            <ul>
+                                <li>Stream Sockets</li>
+                                <li>Datagram Sockets</li>
+                            </ul>
+                        </li>
+					</ul>
+				</section>
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">Internet Protocol</h3>
+                    </section>
+                    <section>
+                        <h2>Internet Protocol</h2>
+                        <ul>
+                            <li>Sending packets to their destination</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/layers_02_ip.png" alt="TCP in Layers" />
+                    </section>
+                    <section>
+                        <h2>IP</h2>
+                        <ul>
+                            <li>Addressing</li>
+                            <li>Routing</li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>IP Addresses</h2>
+                        <ul>
+                            <li>IPv4
+                                <ul>
+                                    <li>4 bytes (32 bits)</li>
+                                    <li>Written in decimal, separated by dots</li>
+                                    <li>e.g. 192.197.54.136</li>
+                                </ul>
+                            </li>
+                            <li>IPv6
+                                <ul>
+                                    <li>8 double bytes (128 bits)</li>
+                                    <li>Written in hexadecimal, separated by colons</li>
+                                    <li>e.g. FFE80:0000:0000:0000:0000:0000:AC1E:43FE</li>
+                                    <li>Short form: FFE80:AC1E:43FE</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+                </section>
+
+
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">Transport Control Protocol</h3>
+                    </section>
+
+                    <section>
+                        <h2>Transport Control Protocol</h2>
+                        <ul>
+                            <li>Adding reliability to packet delivery</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/layers_03_tcp.png" alt="TCP in Layers" />
+                    </section>
+                    
+                    <section>
+                        <h2>TCP</h2>
+                        <ul>
+                            <li>Reliable
+                                <ul>
+                                    <li>Streams</li>
+                                    <li>Connections</li>
+                                    <li>Sequence numbers</li>
+                                    <li>Acknowledgements (ACKs)</li>
+                                    <li>Error checking (Checksums)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Streams</h2>
+                        <ul>
+                            <li>In most networks, data is sent in finite quanta, called packets</li>
+                            <li>Output streams are implemented with packets in a similar way to saving data to files via blocks:
+                                <ul>
+                                    <li>Data to be sent is collected in a buffer</li>
+                                    <li>When there is enough data to fill an entire packet is collected, a packet is transmitted</li>
+                                </ul>
+                            </li>
+                            <li>Input streams are implemented with packets in a similar way to reading data from files via blocks:
+                                <ul>
+                                    <li>When you want to read a single character/byte, the buffer is checked</li>
+                                    <li>As packets arrive, their data is added to the buffer</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>TCP Packet Format</h2>
+                        <ul>
+                            <li>Every TCP packet has a header (meta-data):
+                                <ol>
+                                    <li>Flags</li>
+                                    <li>Sequence Number</li>
+                                    <li>Source and Destination Port Number</li>
+                                </ol>
+                            </li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/tcp_packet_format.png" 
+                             alt="TCP Packet Format" />
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Flags</h2>
+                        <ul>
+                            <li>Single-bit binary values:
+                                <ol>
+                                    <li>SYN - attempting to establish a connection</li>
+                                    <li>FIN - attempting to tear down a connection</li>
+                                    <li>ACK - this packet contains an acknowledgement</li>
+                                    <li>RST - attempting to reset the connection</li>
+                                </ol>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Connection Handshake</h2>
+                        <ul>
+                            <li>Before communication can take place, a connection is established</li>
+                            <li>This is a three-step process:
+                                <ol>
+                                    <li>Client sends a connection request (SYN)</li>
+                                    <li>Server acknowledges connection request (SYN+ACK)</li>
+                                    <li>Client acknowledges receipt of server's response (ACK)</li>
+                                </ol>
+                            </li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/connection_handshake.png" 
+                             alt="Connection Handshake" />
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Disconnection Handshake</h2>
+                        <ul>
+                            <li>To disconnect, another three-way handshake occurs:
+                                <ol>
+                                    <li>Client sends a connection finished request (FIN)</li>
+                                    <li>Server acknowledges connection finished request (FIN+ACK)</li>
+                                    <li>Client acknowledges receipt of server's response (ACK)</li>
+                                </ol>
+                            </li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/disconnection_handshake.png" 
+                             alt="Disconnection Handshake" />
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Sequence Numbers</h2>
+                        <ul>
+                            <li>Each packet has a randomized, hard-to-predict sequence number</li>
+                            <li>This sequence number is used when acknowledging a packet</li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Acknowledgements</h2>
+                        <ul>
+                            <li>Each packet is acknowledged (by its sequence number) by sending a message back to the sender</li>
+                            <li>Without any improvements:</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/acknowledgements_no_window.png" 
+                             alt="Acknowledgements Without Sliding Window" />
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Acknowledgements</h2>
+                        <ul>
+                            <li>Improvements:
+                                <ul>
+                                    <li>Piggybacked acknowledgements
+                                        <ul>
+                                            <li>Acknowledgements are sent in messages that were already going to be sent back in response</li>
+                                        </ul>
+                                    </li>
+                                    <li>Sliding window
+                                        <ul>
+                                            <li>Up to N unacknowledged packets can be out at once:</li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/acknowledgements_sliding_window.png" 
+                             alt="Acknowledgements Without Sliding Window" />
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Port Numbers</h2>
+                        <ul>
+                            <li>A destination port number serves a similar purpose as an IP address
+                                <ul>
+                                    <li>IP address
+                                        <ul>
+                                            <li>Which computer on the network should receive this packet?</li>
+                                        </ul>
+                                    </li>
+                                    <li>Destination port
+                                        <ul>
+                                            <li>Which application on that computer should receive this packet?</li>
+                                        </ul>
+                                    </li>                                
+                                </ul>
+                            </li>
+                            <li>A source port number is to give the receiving computer a way to contact the source application with its next message</li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>Well-Known Port Numbers</h2>
+                        <ul>
+                            <li>There are many standard port numbers:
+                                <ul>
+                                    <li>22:  SSH</li>
+                                    <li>25:  Sending E-Mail</li>
+                                    <li>53:  DNS</li>
+                                    <li>80:  Unencrypted HTTP</li>
+                                    <li>110/143:  Receiving E-Mail</li>
+                                    <li>443:  Encrypted HTTP (HTTPS)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+                </section>
+                
+                
+                <section data-transition='fade'>
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">User Datagram Protocol</h3>
+                    </section>
+                    <section>
+                        <h2>User Datagram Protocol</h2>
+                        <ul>
+                            <li>Transport without the reliability baggage</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/layers_04_udp.png" alt="UDP in Layers" />
+                    </section>
+                    <section>
+                        <h2>User Datagram Protocol</h2>
+                        <ul>
+                            <li>Pros:
+                                <ul>
+                                    <li>No acknowledgements</li>
+                                    <li>No connection set up/tear down</li>
+                                    <li>Supports multicast/broadcast</li>
+                                </ul>
+                            </li>
+                            <li>Cons:
+                                <ul>
+                                    <li>Lost packets are not identified and resent</li>
+                                    <li>Packets may arrive out of order</li>
+                                    <li>Does not implement streams</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <aside class="notes">
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>UDP Packet Format</h2>
+                        <ul>
+                            <li>UDP packets have no flags, acknowledgements, sequence numbers:</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/udp_packet_format.png" alt="UDP Packet Format" />
+                        <aside class="notes">
+                        </aside>
+                    </section>
+                </section>
+                                
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">TCP Socket Programming</h3>
+                    </section>
+                    
+                    <section>
+                        <h2>TCP Sockets in Java</h2>
+                        <ul>
+                            <li>Listens for incoming connections (server, passive open):</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+ServerSocket serverSocket = new ServerSocket(8080);
+while (true) {
+    Socket clientSocket = serverSocket.accept();
+    ... input and output goes here ...
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Java</h2>
+                        <ul>
+                            <li>Connects to the server (client, active open):</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Socket socket = new Socket("myhost.com", 8080);
+... input and output goes here ...
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Java</h2>
+                        <ul>
+                            <li>Send output to a socket:</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Socket socket = new Socket("myhost.com", 8080);
+PrintWriter out = new PrintWriter(socket.getOutputStream());
+String request = "GET /index.html HTTP/1.0\r\nHost:myhost.com\r\n\r\n";
+out.print(request);
+out.flush();
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Java</h2>
+                        <ul>
+                            <li>Get input from a socket:</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Socket clientSocket = serverSocket.accept();
+InputStream inStream = clientSocket.getInputStream();
+InputStreamReader reader = new InputStreamReader(inStream);
+BufferedReader in = new BufferedReader(reader);
+String line = null;
+while ((line = in.readLine()) != null) {
+    // do something with 'line'
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Java</h2>
+                        <ul>
+                            <li>Disconnect from a socket:</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+Socket clientSocket = serverSocket.accept();
+...
+clientSocket.close();
+    </code></pre>
+                    </section>
+                </section>
+                
+                <section data-transition="fade">
+                    <section>
+                        <h2>TCP Sockets in Python</h2>
+                        <ul>
+                            <li>Listens for incoming connections (server, passive open):</li>
+                        </ul>
+                        <pre><code class="hljs python" data-trim contenteditable>
+serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverSocket.bind((socket.gethostname(), 8080))
+serverSocket.listen(5) # 5 requests queued
+while True:
+    (clientSocket, address) = serverSocket.accept()
+    ... input and output goes here ...
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Python</h2>
+                        <ul>
+                            <li>Connects to the server (client, active open):</li>
+                        </ul>
+                        <pre><code class="hljs python" data-trim contenteditable>
+socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+socket.connect(("myhost.com", 8080))
+... input and output goes here ...
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Python</h2>
+                        <ul>
+                            <li>Send output to a socket:</li>
+                        </ul>
+                        <pre><code class="hljs python" data-trim contenteditable>
+socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+socket.connect(("myhost.com", 8080))
+request = "GET /index.html HTTP/1.0\r\nHost:myhost.com\r\n\r\n"
+socket.send(request)
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Python</h2>
+                        <ul>
+                            <li>Get input from a socket:</li>
+                        </ul>
+                        <pre><code class="hljs python" data-trim contenteditable>
+(clientSocket, address) = serverSocket.accept()
+receivedBytes = -1
+while receivedBytes != 0:
+    line = clientSocket.recv(2048)
+    # do something with 'line'
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>TCP Sockets in Python</h2>
+                        <ul>
+                            <li>Disconnect from a socket:</li>
+                        </ul>
+                        <pre><code class="hljs python" data-trim contenteditable>
+clientSocket = serverSocket.accept()
+...
+clientSocket.close()
+                        </code></pre>
+                    </section>
+                </section>
+                
+        
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">UDP Socket Programming</h3>
+                    </section>
+
+                    <section>
+                        <h2>UDP Sockets in Java</h2>
+                        <ul>
+                            <li>Sending packets (user datagrams):</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+DatagramSocket socket  = new DatagramSocket(16789);
+String msg = "hello";
+String IP = "192.197.54.136";
+// The following can also do DNS lookup
+InetAddress address = InetAddress.getByName(IP); 
+DatagramPacket outputPacket = new DatagramPacket(msg.getBytes(), 
+                                                 msg.length(), 
+                                                 address, 12465);
+socket.send(outputPacket);
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>UDP Sockets in Java</h2>
+                        <ul>
+                            <li>Receiving packets (user datagrams):</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+DatagramSocket socket  = new DatagramSocket(16789);
+byte[] data = byte[256];
+DatagramPacket inputPacket = new DatagramPacket(data, 256);
+socket.receive(inputPacket);
+                        </code></pre>
+                    </section>
+                </section>
+                
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">Network Programming Architectures</h3>
+                    </section>
+                    
+                    <section>
+                        <h2>Network Programming Architectures</h2>
+                        <ul>
+                            <li>Client/server</li>
+                            <li>Peer to peer</li>
+                            <li>Hybrid</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section data-transition="fade">
+                    <section data-transition='fade'>
+                        <h2>Client/server</h2>
+                        <ul>
+                            <li>One server is accessed by a number of (identical?) clients</li>
+                            <li>The server is passively listening</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/client_server_01.png" alt="Client/Server Before Connections" />
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>Client/server</h2>
+                        <ul>
+                            <li>The client actively initiates the connection</li>
+                            <li>The client needs to know the IP address/port of the server</li>
+                            <li>This initial message is often called a request</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/client_server_02.png" alt="Client/Server Request" />
+                    </section>
+
+                    <section data-transition='fade'>
+                        <h2>Client/server</h2>
+                        <ul>
+                            <li>The server provides a response to the request</li>
+                            <li>The IP address/port from the request are used for the response</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/client_server_03.png" alt="Client/Server Response" />
+                    </section>
+                </section>
+
+                <section data-transition="fade">
+                    <section data-transition='fade'>
+                        <h2>Peer to peer</h2>
+                        <ul>
+                            <li>All (identical?) peers have the same purpose</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/peer_to_peer_01.png" alt="Peer to Peer Before Messaging" />
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>Peer to peer</h2>
+                        <ul>
+                            <li>Any peer can send messages to any other</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/peer_to_peer_02.png" alt="Peer to Peer First Message" />
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>Peer to peer</h2>
+                        <ul>
+                            <li>Any peer can send messages to any other</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/peer_to_peer_03.png" alt="Peer to Peer Second Message" />
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>Peer to peer</h2>
+                        <ul>
+                            <li>Any peer can send messages to any other</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/peer_to_peer_04.png" alt="Peer to Peer Third Message" />
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>Peer to peer</h2>
+                        <ul>
+                            <li>Any peer can send messages to any other</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/peer_to_peer_05.png" alt="Peer to Peer Fourth Message" />
+                    </section>
+                    
+                    <section data-transition='fade'>
+                        <h2>Peer to peer</h2>
+                        <ul>
+                            <li>Any peer can send messages to any other</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/peer_to_peer_06.png" alt="Peer to Peer Fifth Message" />
+                    </section>
+                </section>
+                
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">Hypertext Transfer Protocol</h3>
+                    </section>
+
+                    <section>
+                        <h2>HTTP</h2>
+                        <ul>
+                            <li>Client/server protocol for uploading/downloading files</li>
+                            <li>An HTTP client (browser) issues a request:</li>
+                        </ul>
+					   <pre><code class="hljs" data-trim contenteditable>
+GET / HTTP/1.1\r\n
+Host: stackoverflow.com\r\n
+Connection: keep-alive\r\n
+Accept: text/html\r\n
+Upgrade-Insecure-Requests: 1\r\n
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64)\r\n
+Accept-Encoding: gzip, deflate\r\n
+Accept-Language: en-US,en;q=0.8\r\n
+Cookie: ...
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>HTTP</h2>
+                        <ul>
+                            <li>Client/server protocol for uploading/downloading files</li>
+                            <li>The HTTP server (web server) issues a response:</li>
+                        </ul>
+					   <pre><code class="hljs" data-trim contenteditable>
+HTTP/1.1 200 OK\r\n
+Date: Thu, 14 Jan 2016 02:11:33 GMT\r\n
+Content-Type: text/html; charset=utf-8\r\n
+Content-Length: 40269\r\n
+Connection: keep-alive\r\n
+Cache-Control: public, max-age=31\r\n
+Content-Encoding: gzip\r\n
+Expires: Thu, 14 Jan 2016 02:12:05 GMT\r\n
+Last-Modified: Thu, 14 Jan 2016 02:11:05 GMT\r\n
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">URL and URL Connections</h3>
+                    </section>
+
+                    <section>
+                        <h2>URL</h2>
+                        <ul>
+                            <li>Represents a URL</li>
+                            <li>Provides an easy way to connect to web servers</li>
+                        </ul>
+                        <img src="images/05_tcp_udp_sockets/url.png" alt="A URL Broken Down" />
+                        <pre><code class="hljs java" data-trim contenteditable>
+URL url = new URL("http://" + hostName + ":" + portNumber + "/index.html");
+URLConnection conn = url.openConnection();
+conn.setDoOutput(false);
+conn.setDoInput(true);
+InputStream is = conn.getInputStream();
+...
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">Open Data</h3>
+                    </section>
+
+                    <section>
+                        <h2>Open Data</h2>
+                        <ul>
+                            <li>CSV</li>
+                            <li>JSON</li>
+                            <li>XML</li>
+                        </ul>
+                    </section>
+                    
+                    <section>
+                        <h2>CSV</h2>
+                        <ul style="font-size: 80%">
+                            <li>Comma-separated values</li>
+                            <li>e.g. http://open.canada.ca/data/en/dataset/ffe1ad5f-49c4-4d03-8b8e-25919d4481af</li>
+                        </ul>
+                        <pre><code class="hljs" data-trim contenteditable>
+Ref_Date,GEO,VAR,SEX,AGE,STATS,CHAR,Vector,Coordinate,Value
+2009,Canada,Body Mass Index (BMI) - Center for Disease Control (CDC) classification,Both sexes,Ages 3 to 17,Underweight,Estimate,v88847602,1.1.1.1.1.1,..
+2011,Canada,Body Mass Index (BMI) - Center for Disease Control (CDC) classification,Both sexes,Ages 3 to 17,Underweight,Estimate,v88847602,1.1.1.1.1.1,4.5
+2013,Canada,Body Mass Index (BMI) - Center for Disease Control (CDC) classification,Both sexes,Ages 3 to 17,Underweight,Estimate,v88847602,1.1.1.1.1.1,5.0
+...
+                        </code></pre>
+                    </section>
+                    
+                    <section>
+                        <h2>JSON</h2>
+                        <ul style="font-size: 80%">
+                            <li>JavaScript Object Notation</li>
+                            <li>e.g. http://api.coindesk.com/v1/bpi/currentprice/CAD.json</li>
+                        </ul>
+                        <pre><code class="hljs json" data-trim contenteditable>
+{"bpi":{
+        "USD":{
+               "code":"USD",
+               "rate":"421.3680",
+               "description":"United States Dollar",	
+               "rate_float":421.368},
+        "CAD":{
+               "code":"CAD",
+               "rate":"553.1846",
+               "description":"Canadian Dollar",
+               "rate_float":553.1846}
+        }
+}
+                        </code></pre>
+                    </section>
+                    
+                    <section>
+                        <h2>XML</h2>
+                        <ul style="font-size: 80%">
+                            <li>eXtensible Markup Language</li>
+                            <li>e.g. http://www.bikesharetoronto.com/data/stations/bikeStations.xml</li>
+                        </ul>
+                        <pre><code class="hljs" data-trim contenteditable>
+&lt;stations lastUpdate="1452772137445" version="2.0"&gt;
+  &lt;station&gt;
+   &lt;id&gt;1&lt;/id&gt;
+   &lt;name&gt;Jarvis St / Carlton St&lt;/name&gt;
+   &lt;terminalName&gt;7055&lt;/terminalName&gt;
+   &lt;lastCommWithServer&gt;1452771534819&lt;/lastCommWithServer&gt;
+   &lt;lat&gt;43.66207&lt;/lat&gt;
+   &lt;long&gt;-79.37617&lt;/long&gt;
+   &lt;installed&gt;true&lt;/installed&gt;
+   &lt;locked&gt;false&lt;/locked&gt;
+   ...
+  &lt;/station&gt;
+&lt;/stations&gt;
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section data-transition="fade">
+                    <section data-background="images/UOIT_background5.png"
+                             data-background-size="70%"
+                             data-transition='fade'>
+                        <h2 style="margin-left: 30%; font-size: 80%">TCP, UDP, Sockets, Open Data</h2>
+                        <h3 style="margin-left: 30%">Processing Data</h3>
+                    </section>
+
+                    <section>
+                        <h2>CSV</h2>
+                        <pre><code class="hljs java" data-trim contenteditable>
+String csvData = ...;
+String[] rows = csvData.split("\n");
+for (int i = 0; i &lt; rows.length; i++) {
+   String[] cells = rows.split(",");
+   ...
+}
+                        </code></pre>
+                    </section>
+                    
+                    <section>
+                        <h2>JSON</h2>
+                        <ul>
+                            <li>This code uses the Simple JSON library</li>
+                            <li>Maven: http://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple</li>
+                        </ul>
+                        <pre><code class="hljs java" data-trim contenteditable>
+BufferedReader jsonSource = ...;
+JSONParser parser = new JSONParser();
+JSONObject obj = (JSONObject)parser.parse(jsonSource);
+
+/*{"bpi":{
+        ...
+        "CAD":{
+               "code":"CAD",
+               "rate":"553.1846",
+               "description":"Canadian Dollar",
+               "rate_float":553.1846}
+        }
+}*/
+JSONObject bpi = (JSONObject)obj.get("bpi");
+JSONObject cad = (JSONObject)bpi.get("CAD");
+double rate = (Double)cad.get("rate_float");
+                        </code></pre>
+                    </section>
+                    
+                    <section>
+                        <h2>XML</h2>
+                        <pre><code class="hljs java" data-trim contenteditable>
+InputStream inStream = conn.getInputStream();
+DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
+Document document = docBuilder.parse(inStream);
+document.getDocumentElement().normalize();
+
+NodeList itemNodes = document.getElementsByTagName("stations");
+ 
+for (int i = 0; i &lt; itemNodes.getLength(); i++) {
+   Node itemNode = itemNodes.item(i);
+   if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
+      Element itemElement = (Element)itemNode;
+      String name = getTagValue("name", itemElement);
+      ...
+   }
+}
+                        </code></pre>
+                    </section>
+                </section>
+                
+                <section data-transition='fade'>
+					<h2>Wrap-Up</h2>
+					<ul>
+						<li>In this section we learned about:
+							<ul>
+                                <li>Internet Protocol (IP)</li>
+                                <li>TCP and UDP</li>
+                                <li>Socket Programming</li>
+                                <li>HTTP and URLs</li>
+                                <li>Open Data</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+		<script src="js/uoit.js"></script>
+
+	</body>
+</html>
